@@ -4,7 +4,7 @@ jobs:
    include:
      - stage: Build
        script: gradle clean build
-	   
+       
      - stage: Test
        name: Unit Test
        script: gradle test
