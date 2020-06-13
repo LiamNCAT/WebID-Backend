@@ -2,9 +2,9 @@ language: java
 jdk: oraclejdk8
 jobs:
    include:
-     - stage: "Build"
+     - stage: Build
        script: gradle clean build
 	   
-     - stage: "Test"
-       name: "Unit Test"
+     - stage: Test
+       name: Unit Test
        script: gradle test
