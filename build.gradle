@@ -7,11 +7,30 @@
 
  plugins{
 	 id 'war' 
+	 id 'maven-publish'
  }
  
  repositories {
 	 jcenter()
   }
+  
+  publishing {
+	  repositories {
+		  maven {
+			  name = "GitHubPackages"
+			  url = uri("https://maven.pkg.github.com/LiamNCAT/WebID-Backend")
+			  credentials {
+				  username = project.findProperty("gpr.user")
+				  password = project.findProperty("gpr.key")
+			  }
+		  }
+		  publications {
+			  gpr(MavenPublication) {
+				  from(components.java)
+		}
+	  }
+  }
+}
   
   dependencies {
 	  providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
