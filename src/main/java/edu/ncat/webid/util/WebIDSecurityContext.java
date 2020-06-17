@@ -2,11 +2,16 @@ package edu.ncat.webid.util;
 
 import java.security.Principal;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
 public class WebIDSecurityContext implements SecurityContext{
 
 	private Principal principal;
+
+	@Context
+	HttpServletRequest req;
 	
 	public WebIDSecurityContext(Principal prin) {
 		principal = prin;
@@ -25,14 +30,13 @@ public class WebIDSecurityContext implements SecurityContext{
 
 	@Override
 	public boolean isSecure() {
+		return req.isSecure();
 		
-		return false;
 	}
 
 	@Override
 	public String getAuthenticationScheme() {
-		// TODO Auto-generated method stub
-		return null;
+		return req.getAuthType();
 	}
 
 }

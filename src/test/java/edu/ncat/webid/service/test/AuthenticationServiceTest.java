@@ -4,40 +4,41 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 
-import javax.security.auth.x500.X500Principal;
-
+import org.apache.jena.rdf.model.Model;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.wymiwyg.wrhapi.Request;
-
-import com.hp.hpl.jena.rdf.model.Model;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.ncat.webid.jaxb.User;
 import edu.ncat.webid.services.AuthenticationService;
 import edu.ncat.webid.util.WebIDSecurityContext;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AuthenticationServiceTest {
 
-	AuthenticationService as;
+	@InjectMocks AuthenticationService as;
 	
 	@Mock WebIDSecurityContext sec;
-	@Mock Request req;
-	
-	Principal prin;
+	@Mock Principal prin;
 	
 	User user;
+	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		as = new AuthenticationService();
-		//InputStream is = this.getClass().getResourceAsStream("/edu/ncat/webid/resource/cert.pem");
-		//prin = new X500Principal(is);
 		
 		user = new User();
 		user.setFirstName("William");
@@ -49,7 +50,7 @@ public class AuthenticationServiceTest {
 	
 	@Test
 	public void canAutheticateWithValidWebID() {
-		Mockito.when(sec.getUserPrincipal()).thenReturn(prin);
+		//Mockito.when(sec.getUserPrincipal()).thenReturn(prin);
 		//boolean auth = as.login(sec, req);
 		//assertEquals(auth, true);
 		
@@ -60,4 +61,13 @@ public class AuthenticationServiceTest {
 		Model m = as.register(user);
 		assertNotNull(m);
 	}
+	
+	@Test
+	public void canCreateCerts() throws NoSuchAlgorithmException, InvalidKeySpecException, CertificateException, OperatorCreationException, IOException {
+		String URL = user.getUri()+"/profile.rdf";
+		X509Certificate cert = as.cert(URL);
+		assertNotNull(cert);
+		cert.getSubjectAlternativeNames();
+	}
+	
 }
