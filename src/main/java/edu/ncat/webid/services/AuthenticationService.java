@@ -18,6 +18,7 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.Subject;
 import javax.security.auth.x500.X500Principal;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -50,15 +51,19 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 @Path("/api/authentication")
 public class AuthenticationService {
+	@Context WebIDSecurityContext sec;
+	@Context HttpServletRequest req;
+	
 	
 	@Path("/login")
 	@POST
-	public boolean login(@Context WebIDSecurityContext sec) {
+	public boolean login() {
 		Subject subject = new Subject();
 		subject.getPrincipals().add(sec.getUserPrincipal());
 		
 		return true;
 	}
+	
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@POST
@@ -77,6 +82,9 @@ public class AuthenticationService {
 		return m;
 	}
 	
+	
+	@Path("/cert")
+	@POST
 	public X509Certificate cert(String URI) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, CertificateException, OperatorCreationException {
 		KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
         gen.initialize(2048, new SecureRandom()); // going beyond 2048 requires crypto extension

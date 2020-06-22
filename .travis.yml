@@ -7,10 +7,7 @@ jobs:
        script: gradle clean build
        
      - stage: Test
-       script: gradle test
-       
-     - stage: Generate jacoco reports
-       script: gradle jacocoTestReport
+       script: gradle test jacocoTestReport coverall
      
      - stage: Run Linter
        script: gradle checkstyleMain

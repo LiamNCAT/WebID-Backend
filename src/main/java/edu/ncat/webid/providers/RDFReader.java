@@ -5,25 +5,33 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+
+import edu.ncat.webid.util.RDFTypes;
+
+
 @Provider
-public class RDFReader implements MessageBodyReader{
+@Consumes({RDFTypes.N3, RDFTypes.NTriples, RDFTypes.RDFXML})
+public class RDFReader implements MessageBodyReader<Model>{
 
 	@Override
-	public boolean isReadable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+		return Model.class.isAssignableFrom(type);
 	}
 
 	@Override
-	public Object readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Model readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+		Model m = ModelFactory.createDefaultModel();
+		m.read(entityStream, null, RDFTypes.getType(mediaType.getType()));
+		return m;
 	}
 
 }
