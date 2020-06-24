@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -17,7 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import edu.ncat.webid.util.RDFTypes;
 
 @Provider
-@Consumes({RDFTypes.N3, RDFTypes.NTriples, RDFTypes.RDFXML})
+@Produces({RDFTypes.N3, RDFTypes.NTriples, RDFTypes.RDFXML})
 public class RDFWriter implements MessageBodyWriter<Model>{
 
 	@Override
