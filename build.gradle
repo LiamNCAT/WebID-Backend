@@ -32,7 +32,7 @@
 			  url = uri("https://maven.pkg.github.com/LiamNCAT/WebID-Backend")
 			  credentials {
 				  username = "LiamNCAT"
-				  password = "a618b00e6b0b4c482c9dbf0e450dc8664f4cb1fb"
+				  password = "6ce4ad65c89fd13ff52d12b6ab8e3a62f969f690"
 			  }
 		  }
 		  publications {
