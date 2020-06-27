@@ -11,3 +11,6 @@ jobs:
      
      - stage: Run Linter
        script: gradle checkstyleMain
+     
+     - stage: Publish to Github
+       script: gradle publish

@@ -3,8 +3,9 @@
  *
  * This is a general purpose Gradle build.
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds
+ *
  */
-
+ 
  plugins{
 	 id 'war' 
 	 id 'maven-publish'
@@ -30,13 +31,16 @@
 			  name = "GitHubPackages"
 			  url = uri("https://maven.pkg.github.com/LiamNCAT/WebID-Backend")
 			  credentials {
-				  username = project.findProperty("gpr.user")
-				  password = project.findProperty("gpr.key")
+				  username = "LiamNCAT"
+				  password = "a618b00e6b0b4c482c9dbf0e450dc8664f4cb1fb"
 			  }
 		  }
 		  publications {
 			  gpr(MavenPublication) {
-				  from(components.java)
+				  from(components.web)
+				  groupId 'edu.ncat.webid' // Replace with group ID
+				  artifactId 'webid-backend'
+				  version '1.0.1'
 		}
 	 }
   }
