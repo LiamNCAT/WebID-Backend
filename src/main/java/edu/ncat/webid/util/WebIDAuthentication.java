@@ -22,15 +22,16 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class WebIDAuthentication {
+	Model m;
+	QueryExecution qexec;
 	
+	public WebIDAuthentication(){
+		m = ModelFactory.createDefaultModel();
+	}
 	
 	
 	public boolean authenticate(Subject sub, HttpServletRequest req) throws CertificateParsingException {    
 		X509Certificate cert = ((X509Certificate[])req.getAttribute("javax.servlet.request.X509Certificate"))[0];
-		
-		if(!cert.getSubjectX500Principal().implies(sub)) {
-			return false;
-		}
 		
 		Collection<List<?>> san = cert.getSubjectAlternativeNames();
 		
@@ -48,11 +49,7 @@ public class WebIDAuthentication {
 			sanInfo = iter.next();
 		}
 		
-		if (sanInfo == null || sanInfo.size() < 2) {
-		    return false;
-		}
 		
-		Model m = ModelFactory.createDefaultModel();
 		m.read((String) sanInfo.get(1));
 		
 		ResultSet response = query(m);
@@ -92,7 +89,7 @@ public class WebIDAuthentication {
 		queryStr.append(" ?k cert:exponent ?exp. }");
 		
 		Query query = QueryFactory.create(queryStr.toString());
-		QueryExecution qexec = QueryExecutionFactory.create(query, m);
+		qexec = QueryExecutionFactory.create(query, m);
 		
 		try {
 			   response = qexec.execSelect();

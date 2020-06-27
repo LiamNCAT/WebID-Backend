@@ -14,6 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.Subject;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 
 import edu.ncat.webid.jaxb.User;
+import edu.ncat.webid.util.WebIDAuthentication;
 import edu.ncat.webid.util.WebIDSecurityContext;
 
 import org.apache.jena.rdf.model.Model;
@@ -35,7 +37,10 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -54,12 +59,17 @@ public class AuthenticationService {
 	@Context WebIDSecurityContext sec;
 	@Context HttpServletRequest req;
 	
+	WebIDAuthentication webidAuth;
+	
 	
 	@Path("/login")
 	@POST
-	public boolean login() {
+	public boolean login() throws CertificateParsingException {
 		Subject subject = new Subject();
 		subject.getPrincipals().add(sec.getUserPrincipal());
+		
+		webidAuth = new WebIDAuthentication();
+		webidAuth.authenticate(subject, req);
 		
 		return true;
 	}
@@ -105,7 +115,9 @@ public class AuthenticationService {
 		
 		X509v3CertificateBuilder generator = new X509v3CertificateBuilder(serverSubjectName, sn, from, to, serverSubjectName, subPubKeyInfo);
 		
-		generator.addExtension(Extension.subjectAlternativeName, false, new DERBMPString(URI));
+		GeneralNames subjectAltName = new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, URI));
+		
+		generator.addExtension(X509Extensions.SubjectAlternativeName, false, subjectAltName);
 		
 		byte[] serverChain = generator.build(signer).getEncoded();
 		

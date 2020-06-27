@@ -2,6 +2,7 @@ package edu.ncat.webid.util.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,6 +23,9 @@ import java.util.Date;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -31,7 +35,10 @@ import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
@@ -53,13 +60,14 @@ import edu.ncat.webid.vocabulary.CERT;
 public class WebIDAuthenticationTest {
 	@Mock Subject sub;
 	@Mock HttpServletRequest req;
-	
 	@InjectMocks WebIDAuthentication webidAuth;
+	
 	X509Certificate [] certs;
 	
 	@Before
 	public void setup() throws OperatorCreationException, NoSuchAlgorithmException, IOException, CertificateException {
 		MockitoAnnotations.initMocks(this);
+		
 		certs = new X509Certificate[1];
 		
 		KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
@@ -81,8 +89,6 @@ public class WebIDAuthenticationTest {
 		
 		X509v3CertificateBuilder generator = new X509v3CertificateBuilder(serverSubjectName, sn, from, to, serverSubjectName, subPubKeyInfo);
 		
-		generator.addExtension(Extension.subjectAlternativeName, false, new DERBMPString(""));
-		
 		byte[] serverChain = generator.build(signer).getEncoded();
 		
 		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
@@ -91,13 +97,8 @@ public class WebIDAuthenticationTest {
 	}
 	
 	@Test
-	public void WebIDAuthenticatesProperly() throws CertificateParsingException {
-		Mockito.when(req.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certs);
-		boolean authed = webidAuth.authenticate(sub, req);
-	}
-	
-	@Test
-	public void WebIDDoesNotAuthenticateWhenSubjectDoesNotImply() throws CertificateParsingException{
+	public void WebIDDoesNotAuthenticateWhenSubjectDoesNotImply() throws IOException, CertificateException, OperatorCreationException, NoSuchAlgorithmException{
+		
 		Mockito.when(req.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certs);
 		//Mockito.when(certs[0].getSubjectAlternativeNames()).thenReturn(null);
 		
