@@ -13,7 +13,6 @@
 	 id 'checkstyle'
 	 id 'com.github.kt3k.coveralls' version '2.6.3'
 	 id 'java'
-	 id "com.github.spotbugs"
  }
  
  repositories {
