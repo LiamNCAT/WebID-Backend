@@ -24,7 +24,7 @@ public class RDFReader implements MessageBodyReader<Model>{
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return Model.class.isAssignableFrom(type);
+		return type.isInstance(Model.class);
 	}
 
 	@Override

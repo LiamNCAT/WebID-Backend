@@ -23,6 +23,8 @@ public class WebIDAuthenticationFilter implements ContainerRequestFilter{
 	@Context
 	private ResourceInfo resourceInfo;
 	
+	private WebIDSecurityContext wisc;
+		
 	private static final ResponseBuilder ACCESS_DENIED = Response.status(Response.Status.UNAUTHORIZED).entity("User not authenticated");
 	//private static final ResponseBuilder ACCESS_FORBIDDEN = Response.status(Response.Status.FORBIDDEN).entity("Access denied");
 	
@@ -36,7 +38,9 @@ public class WebIDAuthenticationFilter implements ContainerRequestFilter{
 	      return;
 	    }
 	    
-	    requestContext.setSecurityContext(new WebIDSecurityContext(principal));
+	    wisc = new WebIDSecurityContext(principal);
+	    
+	    requestContext.setSecurityContext(wisc);
 		
 	}
 
@@ -50,6 +54,9 @@ public class WebIDAuthenticationFilter implements ContainerRequestFilter{
 	      return null;
 	    }
 	}
-	  
+	
+	public WebIDSecurityContext getWisc() {
+		return wisc;
+	}
 	  
 }

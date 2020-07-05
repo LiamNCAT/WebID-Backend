@@ -21,6 +21,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
+/**
+ * 
+ * @author Liam
+ *
+ */
+
 public class WebIDAuthentication {
 	Model m;
 	QueryExecution qexec;

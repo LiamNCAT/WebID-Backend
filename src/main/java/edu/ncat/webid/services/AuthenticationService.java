@@ -50,6 +50,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * 
+ * 
  * @author William Nick
  *
  */
@@ -61,6 +62,12 @@ public class AuthenticationService {
 	
 	WebIDAuthentication webidAuth;
 	
+	/**
+	 * Authenticates a user with a valid WebID
+	 * @return true-if the WebID is valid
+	 * @return false-if the WebID is invalid
+	 * @throws CertificateParsingException
+	 */
 	
 	@Path("/login")
 	@POST
@@ -73,6 +80,11 @@ public class AuthenticationService {
 		
 		return true;
 	}
+	/**
+	 * Registers the user of the WebID protocol and creates a FOAF profile
+	 * @param user
+	 * @return the FOAF profile for that particular user
+	 */
 	
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -91,6 +103,16 @@ public class AuthenticationService {
 		
 		return m;
 	}
+	/**
+	 * Creates a self-signed certificate for a WebID user
+	 * @param URI the users server URI for the WebID user
+	 * @return a X509 certificate that has the user's server as the Subject Alternative Name
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws OperatorCreationException
+	 */
 	
 	
 	@Path("/cert")
