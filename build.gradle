@@ -13,6 +13,7 @@
 	 id 'checkstyle'
 	 id 'com.github.kt3k.coveralls' version '2.6.3'
 	 id 'java'
+	 id "org.sonarqube" version "2.8"
  }
  
  repositories {
@@ -47,6 +48,11 @@
   }
 }
 
+sonarqube {
+	properties {
+	  property "sonar.projectKey", "LiamNCAT_WebID-Backend"
+	}
+  }
 
   
   dependencies {

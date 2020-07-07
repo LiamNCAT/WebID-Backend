@@ -9,8 +9,13 @@ jobs:
      - stage: Test
        script: gradle test jacocoTestReport coverall
      
-     - stage: Run Linter
-       script: gradle checkstyleMain
+     - stage: Run Sonar
+       script: gradle sonarqube
      
      - stage: Publish to Github
        script: gradle publish
+addons:
+  sonarcloud:
+    organization: "liamncat"
+    token:
+      secure: "f207bd94d79b09e8f083064a2c66e924608cf624"
