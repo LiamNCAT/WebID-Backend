@@ -11,11 +11,11 @@ jobs:
      
      - stage: Run Sonar
        script: gradle sonarqube
+       addons:
+          sonarcloud:
+          organization: "liamncat"
+            token:
+            secure: "m850uBJLWphWJJ2030X+lS6g+i284hPJjH0yYR7I5frZ4IR/NINMWn6bI7Ah4eXoAIu6KeIPrnk29heGhDQuFpML89R01m5knCW5+nyt2f9Cj2tkzVJLrgPpI2pSIlDQoCG+WfMzkeYww8Jy/W5v6dIZ5v5q1w3UvGj11bvaiUClBun3HauvBeZxyFeEsCsPg3W24HWwrRJJF592Va+5y7Ig8nUQLfJ9yX0qS1LMW6uQsqXd8ZF+JCI2pJycMlMxn7hOMA2P5/sASnNwhyZVKjYUlg5xQaaa0pF5q8Xs2j88hmvGexGil5ivPFmS3L6mjZMNybbU5PNscglpujdNOtCPD3hQ4hLRlP/fqVZpdA16ufD0y8gLfnrUNo6ek8UxvSeYRxvcQRem6ZyXr4HzjWZCIMDxzDY+peSxxnhTagpYTp6vVhjPIUV28DzZvXyMIt/h7ejtp3CkcPjb8+GJlyV14wyDPbkIS1dn5W4P14RSwmHHVKWBlUUxo1Y8Vp+YYk9VRZHO53e8INVai2KE8DS/fUihFMMmfmvFRbWqqxTMPpFW41Q8hF/+4+DqVS+AbE2bpwQQ6klAYcIJ905ioUVCdxhAmDiLDzpPo2sSeFx5Otb8Xt+KYxOZs1QVwk5Eik3+VcnBWz74fx7pp58k+8rwtPvuoPhQaCH/fL8rloA="
      
      - stage: Publish to Github
        script: gradle publish
-addons:
-  sonarcloud:
-    organization: "liamncat"
-    token:
-      secure: "f207bd94d79b09e8f083064a2c66e924608cf624"
