@@ -1,6 +1,6 @@
 language: java
 install: skip
-jdk: openjdk8
+jdk: openjdk11
 jobs:
    include:
      - stage: Build
