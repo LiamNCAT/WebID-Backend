@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 
 
 import edu.ncat.webid.jaxb.User;
+import edu.ncat.webid.util.RDFTypes;
 import edu.ncat.webid.util.WebIDAuthentication;
 import edu.ncat.webid.util.WebIDSecurityContext;
 
@@ -87,7 +88,7 @@ public class AuthenticationService {
 	 */
 	
 	@Path("/register")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Consumes(RDFTypes.N3)
 	@POST
 	public Model register(User user) {
 		String uri = user.getUri()+"profile.rdf";
