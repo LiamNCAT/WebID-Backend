@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -21,13 +26,10 @@ public class Biometrics {
 	
 	private int id;
 	
-	public Biometrics(X509Certificate webid) throws CertificateParsingException {
+	public Biometrics(X509Certificate webid, int id) throws CertificateParsingException {
 		Properties prop = new Properties();
 		
-		int numExtractors = 12;
-		
-		Random random = new Random();
-		id = random.nextInt(numExtractors);
+		this.id = id;
 		
 		bioDat = ModelFactory.createDefaultModel();
 		
@@ -54,18 +56,35 @@ public class Biometrics {
 		
 		RDFNode featvec = null;
 		
-		for(int i = 0; i<10240; i++) {
+		while(rSet.hasNext()) {
+			QuerySolution sol = rSet.nextSolution();
+			featvec = sol.get("?fv"); 
+		}
+		
+		for(int i = 0; i<fv.size(); i++) {
 			distance += Math.abs(fv.get(i) - gfv.get(i)); //City Patch (Manhattan) Distance
 			maxDist += Math.max(fv.get(i), gfv.get(i));
 		}
 		
-		return distance;
+		return (distance/maxDist);
 	}
 	
 	private ResultSet query() {
 		ResultSet rSet = null;
 		StringBuffer qstr = new StringBuffer();
+		qstr.append("SELECT ?fv ");
+		qstr.append(" WHERE");
 		
+		Query query = QueryFactory.create(qstr.toString());
+		QueryExecution qexec = QueryExecutionFactory.create(query, bioDat);
+		
+		try {
+			   rSet = qexec.execSelect();
+			   
+		}
+		catch(Exception e) {
+			return null;
+		}
 		
 		
 		return rSet;

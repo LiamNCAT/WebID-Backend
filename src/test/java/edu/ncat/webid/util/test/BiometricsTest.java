@@ -83,7 +83,7 @@ public class BiometricsTest {
 		
 		String personURI = "http://localhost:8090/wnick/profile.rdf#me" ;
 		
-		bio = new Biometrics(certs[0]);
+		bio = new Biometrics(certs[0], 1);
 	}
 	
 	@Test
