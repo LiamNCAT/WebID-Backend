@@ -11,11 +11,16 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
 
 import javax.security.auth.Subject;
 import javax.security.auth.x500.X500Principal;
@@ -28,7 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 
 import edu.ncat.webid.jaxb.User;
-import edu.ncat.webid.util.RDFTypes;
+import edu.ncat.webid.util.Biometrics;
 import edu.ncat.webid.util.WebIDAuthentication;
 import edu.ncat.webid.util.WebIDSecurityContext;
 
@@ -88,7 +93,7 @@ public class AuthenticationService {
 	 */
 	
 	@Path("/register")
-	@Consumes(RDFTypes.N3)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@POST
 	public Model register(User user) {
 		String uri = user.getUri()+"profile.rdf";
@@ -146,6 +151,35 @@ public class AuthenticationService {
 		
 		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(serverChain));
+	}
+	@Path("/bio")
+	@POST
+	public boolean bioAuth(ArrayList<Double> fv, int id) throws CertificateParsingException {
+		X509Certificate cert = ((X509Certificate[])req.getAttribute("javax.servlet.request.X509Certificate"))[0];
+		Collection<List<?>> san = cert.getSubjectAlternativeNames();
+		
+		if(san == null) {
+			return false;
+		}
+		
+		
+		RSAPublicKey pub = (RSAPublicKey) cert.getPublicKey();
+		
+		Iterator<List<?>> iter = san.iterator();
+		List<?> sanInfo = null;
+		
+		if(iter.hasNext()) {
+			sanInfo = iter.next();
+		}
+		Biometrics bio = new Biometrics(cert, id);
+		
+		double compare = bio.compareProbeToGallery(fv);
+		
+		if(compare >= 0.7 && compare <= 0.95) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 }
