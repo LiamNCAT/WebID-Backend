@@ -1,8 +1,12 @@
 package edu.ncat.webid.util.test;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -16,10 +20,14 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.sparql.vocabulary.FOAF;
+import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
@@ -31,15 +39,24 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import edu.ncat.webid.util.Biometrics;
+import edu.ncat.webid.util.RDFTypes;
+import edu.ncat.webid.vocabulary.CERT;
 
 public class BiometricsTest {
+	
 	
 	Biometrics bio;
 	
@@ -83,11 +100,52 @@ public class BiometricsTest {
 		
 		String personURI = "http://localhost:8090/wnick/profile.rdf#me" ;
 		
+		realData.createResource(personURI)
+		.addProperty(RDF.type, FOAF.Person) 
+		.addProperty(CERT.key, 
+			realData.createResource() 
+				.addProperty(RDF.type, CERT.RSAPublicKey)
+				.addProperty(CERT.modulus, pub.getModulus().toString())
+				.addProperty(CERT.exponent, pub.getPublicExponent().toString()));
+		realData.createResource("http://localhost:8090/wnick/profile.rdf#fv01")
+		.addProperty(RDF.type, realData.createResource("http://webid-willtest.rhcloud.com/dfe/terms#FeatureVector"))
+		.addProperty(ResourceFactory.createProperty("http://webid-willtest.rhcloud.com/dfe/terms#represents"), realData.createResource("http://esterline.ncat.edu/identity/biometric#FacialImage"))
+		.addProperty(ResourceFactory.createProperty("http://webid-willtest.rhcloud.com/dfe/terms#depicts"), realData.createResource(personURI))
+		.addProperty(ResourceFactory.createProperty("http://webid-willtest.rhcloud.com/dfe/terms#id"), realData.createLiteral("1"))
+		.addProperty(ResourceFactory.createProperty("http://webid-willtest.rhcloud.com/dfe/terms#value"), "1,2,1");
+		
+		wm.start();
+		
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		realData.write(stream);
+		
+		String rdfData = new String(stream.toByteArray());
+		
+		realData.write(System.out, "N3");
+		
+		wm.stubFor(get(urlEqualTo("/wnick/profile.rdf"))
+				.willReturn(aResponse()
+						.withHeader("Content-Type", RDFTypes.RDFXML)
+						.withBody(rdfData)));
+		
 		bio = new Biometrics(certs[0], 1);
+		
 	}
 	
 	@Test
 	public void validDistance() {
+		ArrayList<Double> dist = new ArrayList<Double>();
+		dist.add(1.0);
+		dist.add(2.0);
+		dist.add(3.0);
 		
+		double distance = bio.compareProbeToGallery(dist);
+		assertThat(distance, allOf(greaterThan(0.0), lessThan(1.0)));
+
+	}
+	
+	@After
+	public void stop() {
+		wm.stop();
 	}
 }

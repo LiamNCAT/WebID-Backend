@@ -1,9 +1,11 @@
 package edu.ncat.webid.util;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +27,7 @@ public class Biometrics {
 	private Model bioDat;
 	
 	private int id;
+	private String personURI;
 	
 	public Biometrics(X509Certificate webid, int id) throws CertificateParsingException {
 		Properties prop = new Properties();
@@ -42,8 +45,8 @@ public class Biometrics {
 		if(iter.hasNext()) {
 			SubAltName = iter.next();
 		}
-		
-		bioDat.read((String) SubAltName.get(1));
+		personURI = (String) SubAltName.get(1);
+		bioDat.read(personURI);
 	}
 	
 	public double compareProbeToGallery(ArrayList<Double> fv) {
@@ -61,6 +64,16 @@ public class Biometrics {
 			featvec = sol.get("?fv"); 
 		}
 		
+		gfv = new ArrayList<Double>();
+		System.out.println(featvec.toString());
+		
+		List<String> temp = Arrays.asList(featvec.toString().split(","));
+		
+		for(String t: temp) {
+			gfv.add(Double.parseDouble(t));
+		}
+		
+		
 		for(int i = 0; i<fv.size(); i++) {
 			distance += Math.abs(fv.get(i) - gfv.get(i)); //City Patch (Manhattan) Distance
 			maxDist += Math.max(fv.get(i), gfv.get(i));
@@ -72,8 +85,15 @@ public class Biometrics {
 	private ResultSet query() {
 		ResultSet rSet = null;
 		StringBuffer qstr = new StringBuffer();
-		qstr.append("SELECT ?fv ");
-		qstr.append(" WHERE");
+		
+		qstr.append("PREFIX bio: <http://webid-willtest.rhcloud.com/dfe/terms#>");
+		qstr.append(" SELECT ?fv ");
+		
+		qstr.append(" WHERE { ?f a bio:FeatureVector.");
+		
+		qstr.append(" ?f bio:id \""+id+"\".");
+		qstr.append(" ?f bio:represents ?b.");
+		qstr.append(" ?f bio:value ?fv.}");
 		
 		Query query = QueryFactory.create(qstr.toString());
 		QueryExecution qexec = QueryExecutionFactory.create(query, bioDat);
@@ -84,6 +104,7 @@ public class Biometrics {
 		}
 		catch(Exception e) {
 			return null;
+			
 		}
 		
 		
