@@ -42,7 +42,7 @@
 				  from(components.web)
 				  groupId 'edu.ncat.webid' // Replace with group ID
 				  artifactId 'webid-backend'
-				  version '1.0.2-SNAPSHOT'
+				  version '1.1'
 		}
 	 }
   }
@@ -67,3 +67,4 @@ sonarqube {
 	  testCompile "com.github.tomakehurst:wiremock-jre8:2.26.3"
 	  testCompile 'org.mockito:mockito-inline:3.0.0'
    }
+  
