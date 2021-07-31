@@ -18,6 +18,12 @@ import edu.ncat.webid.util.WebIDSecurityContext;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
+
+/**
+ * 
+ * @author Bianca
+ *
+ */
 public class WebIDAuthenticationFilter implements ContainerRequestFilter{
 
 	@Context

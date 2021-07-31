@@ -22,12 +22,25 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
+/**
+ * This class has all of the functionality for biometric authentication
+ * @author William Nick
+ *
+ */
+
 public class Biometrics {
 
 	private Model bioDat;
 	
 	private int id;
 	private String personURI;
+	
+	/**
+	 * Creates an biometric object for authentication
+	 * @param webid X509 certificate that is linked to a WebID profile
+	 * @param id The identifier for the feature extractor
+	 * @throws CertificateParsingException
+	 */
 	
 	public Biometrics(X509Certificate webid, int id) throws CertificateParsingException {
 		Properties prop = new Properties();
@@ -48,6 +61,11 @@ public class Biometrics {
 		personURI = (String) SubAltName.get(1);
 		bioDat.read(personURI);
 	}
+	/**
+	 * Compares the feature vectors in the WebID profile to the submitted feature vector
+	 * @param fv The feature vector for the individual that would like to be authenticated
+	 * @return The distance between the enrolled feature vector and submitted feature vector
+	 */
 	
 	public double compareProbeToGallery(ArrayList<Double> fv) {
 		double distance = 0.0;
@@ -82,6 +100,10 @@ public class Biometrics {
 		return (distance/maxDist);
 	}
 	
+	/**
+	 * The query that gets the desired feature vector for the person
+	 * @return the results from the query that has the feature vector
+	 */
 	private ResultSet query() {
 		ResultSet rSet = null;
 		StringBuffer qstr = new StringBuffer();
@@ -103,8 +125,7 @@ public class Biometrics {
 			   
 		}
 		catch(Exception e) {
-			return null;
-			
+			return null;	
 		}
 		
 		

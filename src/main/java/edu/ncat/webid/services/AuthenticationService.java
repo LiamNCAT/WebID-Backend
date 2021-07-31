@@ -55,7 +55,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
- * 
+ * The services used for authenticated a user using WebID and biometric authentication
  * 
  * @author William Nick
  *
@@ -82,13 +82,13 @@ public class AuthenticationService {
 		subject.getPrincipals().add(sec.getUserPrincipal());
 		
 		webidAuth = new WebIDAuthentication();
-		webidAuth.authenticate(subject, req);
+		return webidAuth.authenticate(subject, req);
 		
-		return true;
+		
 	}
 	/**
 	 * Registers the user of the WebID protocol and creates a FOAF profile
-	 * @param user
+	 * @param user the user that has a WebID
 	 * @return the FOAF profile for that particular user
 	 */
 	
@@ -152,6 +152,14 @@ public class AuthenticationService {
 		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(serverChain));
 	}
+	
+	/**
+	 * Authenticates a user using their biometrics as a second factor
+	 * @param fv The users feature vector that is extracted from the image on the frontend
+	 * @param id The id of the feature extractor for GEFE
+	 * @return
+	 * @throws CertificateParsingException
+	 */
 	@Path("/bio")
 	@POST
 	public boolean bioAuth(ArrayList<Double> fv, int id) throws CertificateParsingException {
